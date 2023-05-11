@@ -1,24 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useLayoutEffect,
+  useContext,
+} from "react";
+import "./App.css";
+import ThemeProvider, {ThemeContext} from "./context";
+import Slider from "./Slider";
+import Test from "./Test";
+import Test2 from "./Test2";
 
 function App() {
+  const [letter, setLetter] = useState("b");
+
+  const radioClicked = useRef(true);
+  const runOnce = useRef(false);
+  const theme = useContext(ThemeContext)
+
+
+  // empty array means the useEffect will run only once.
+  useLayoutEffect(() => {
+    if (!runOnce.current) {
+      console.log("ran first");
+    }
+    setLetter("a");
+    runOnce.current = true;
+  }, []);
+
+  useEffect(() => {
+    console.log("ran second");
+    // ! means not
+    radioClicked.current = !radioClicked.current;
+  }, [letter]);
+
+  const letterClick = useCallback((e) => {
+    console.log("ran third");
+    setLetter(e.target.value);
+  });
+  console.log(theme)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className={theme.themes.dark? 'App bg-gray': 'App bg-white'}>
+        <Slider/>
+        <Test letter={letter} setLetter={letterClick} />
+        <Test2 radioClicked={radioClicked}/>
+      </div>
   );
 }
 
